@@ -1,0 +1,109 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(14, 14, 22, 0.8);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: inherit;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 10;
+    }
+
+    .is-loading .loading-overlay {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .spinner-ring {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(139, 92, 246, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--accent);
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div class="flex-center" style="min-height: 70vh;">
+    <div class="glass-card fade-in-up" style="width: 100%; max-width: 520px; text-align: center; position: relative;"
+        id="create-card">
+        <div class="loading-overlay">
+            <div class="spinner-ring"></div>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <div
+                style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); margin-bottom: 1rem;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 22 12 17 22 22 12 2"></polygon>
+                </svg>
+            </div>
+            <h2 class="text-gradient" style="font-size: 2.2rem; margin-bottom: 0.5rem; letter-spacing: -0.5px;">
+                Initialize Arena</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Forge a new battlefield to challenge operatives.
+            </p>
+        </div>
+
+        <form method="post" id="create-form">
+            {% csrf_token %}
+            <div style="margin-bottom: 1.5rem; text-align: left;">
+                <label class="elegant-label" style="display: flex; justify-content: space-between;">
+                    Arena Title <span style="color: var(--error);">*</span>
+                </label>
+                <input type="text" name="title" class="elegant-input" required placeholder="e.g. Cyber Security Basics">
+            </div>
+
+            <div style="margin-bottom: 2.5rem; text-align: left;">
+                <label class="elegant-label">Mission Briefing (Description)</label>
+                <textarea name="description" class="elegant-input" rows="4"
+                    placeholder="Provide context for the operatives facing this challenge..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'dashboard' %}" class="elegant-btn elegant-btn-outline"
+                    style="flex: 1; text-align: center;">Abort</a>
+                <button type="submit" class="elegant-btn" style="flex: 2;">Generate Arena</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('create-form').addEventListener('submit', function () {
+        if (this.checkValidity()) {
+            document.getElementById('create-card').classList.add('is-loading');
+        }
+    });
+</script>
+{% endblock %}

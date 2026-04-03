@@ -1,0 +1,260 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<style>
+    .toast-container {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        z-index: 9999;
+    }
+
+    .toast {
+        background: rgba(20, 20, 30, 0.9);
+        border-left: 4px solid var(--accent);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transform: translateX(120%);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .toast.show {
+        transform: translateX(0);
+    }
+
+    .toast.error {
+        border-left-color: var(--error);
+    }
+
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="dashboard-header fade-in"
+    style="margin-bottom: 2.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1.5rem;">
+    <h1 class="text-gradient" style="font-size: 2.5rem;">{{ quiz.title }}</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 10px;">
+        Join Code: <strong
+            style="color: var(--text-main); font-size: 1.4rem; letter-spacing: 2px; padding: 4px 12px; background: rgba(255,255,255,0.1); border-radius: 6px; border: 1px solid var(--glass-border);">{{quiz.join_code}}</strong>
+    </p>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 10px;">Questions added: <span
+            id="question-count" style="color: var(--accent); font-weight: 600;">{{ quiz.questions.count }}</span></p>
+</div>
+
+<div class="glass-card fade-in" style="max-width: 800px; margin: 0 auto; animation-delay: 0.1s;">
+    <h2 style="font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-main); text-align: center;">
+        <span id="current-question-label">Question {{ quiz.questions.count|add:1 }}</span>
+    </h2>
+
+    <form id="question-form">
+        {% csrf_token %}
+        <div style="margin-bottom: 2rem;">
+            <label class="elegant-label" style="font-size: 1.1rem;">Question Text</label>
+            <textarea name="question_text" class="elegant-input" rows="3" required
+                placeholder="What is the meaning of life?"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+            <div>
+                <label class="elegant-label">Option 1</label>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="radio" name="correct_option" value="1" required
+                        style="width: 20px; height: 20px; accent-color: var(--accent);">
+                    <input type="text" name="option_1" class="elegant-input" style="margin-bottom: 0;" required>
+                </div>
+            </div>
+            <div>
+                <label class="elegant-label">Option 2</label>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="radio" name="correct_option" value="2"
+                        style="width: 20px; height: 20px; accent-color: var(--accent);">
+                    <input type="text" name="option_2" class="elegant-input" style="margin-bottom: 0;" required>
+                </div>
+            </div>
+            <div>
+                <label class="elegant-label">Option 3</label>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="radio" name="correct_option" value="3"
+                        style="width: 20px; height: 20px; accent-color: var(--accent);">
+                    <input type="text" name="option_3" class="elegant-input" style="margin-bottom: 0;" required>
+                </div>
+            </div>
+            <div>
+                <label class="elegant-label">Option 4</label>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="radio" name="correct_option" value="4"
+                        style="width: 20px; height: 20px; accent-color: var(--accent);">
+                    <input type="text" name="option_4" class="elegant-input" style="margin-bottom: 0;" required>
+                </div>
+            </div>
+        </div>
+
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 2rem;">
+            <button type="button" onclick="finishQuiz()" class="elegant-btn elegant-btn-outline">Finish &
+                Return</button>
+            <button type="submit" id="submit-btn" class="elegant-btn">
+                <span class="btn-text">Save Question & Add Next</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${isError ? 'error' : ''}`;
+
+        const icon = isError
+            ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
+            : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+
+        // Trigger reflow
+        void toast.offsetWidth;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function finishQuiz() {
+        // Trigger confetti
+        var duration = 3 * 1000;
+        var end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#8b5cf6', '#3b82f6', '#10b981']
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#8b5cf6', '#3b82f6', '#10b981']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            } else {
+                window.location.href = "{% url 'dashboard' %}";
+            }
+        }());
+
+        // Fallback redirect if confetti fails or takes too long
+        setTimeout(() => {
+            window.location.href = "{% url 'dashboard' %}";
+        }, 1500);
+    }
+
+    document.getElementById('question-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        // Basic validation
+        if (!data.correct_option) {
+            showToast('Please select a correct option', true);
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = submitBtn.querySelector('.btn-text');
+
+        // Set loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+        fetch("{% url 'add_question' quiz.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    showToast('Question saved successfully!');
+                    // Update UI elements
+                    document.getElementById('question-count').innerText = result.question_count;
+                    document.getElementById('current-question-label').innerText = `Question ${result.question_count + 1}`;
+
+                    // Keep csrf token but reset form
+                    const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+                    form.reset();
+                    form.querySelector('[name=csrfmiddlewaretoken]').value = csrf;
+
+                    // Focus back on first input
+                    form.querySelector('[name=question_text]').focus();
+                } else {
+                    showToast(result.message || 'Failed to save question', true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An unexpected error occurred', true);
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="btn-text">Save Question & Add Next</span>';
+            });
+    });
+</script>
+{% endblock %}

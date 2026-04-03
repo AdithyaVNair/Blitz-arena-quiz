@@ -1,0 +1,186 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<style>
+    .question-container {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        width: 100%;
+        max-width: 900px;
+    }
+
+    .question-container.active {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .quiz-progress-text {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .question-text {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+        text-align: center;
+        margin-bottom: 2rem;
+        font-family: var(--font-heading);
+        line-height: 1.3;
+    }
+</style>
+
+<div class="quiz-fullscreen-container">
+
+    <div style="text-align: center; margin-bottom: 1rem;">
+        <h1 class="text-gradient" style="font-size: 1.5rem;">{{ quiz.title }}</h1>
+    </div>
+
+    <!-- Timer Bar -->
+    <div class="timer-bar-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <form method="post" id="quizForm" style="width: 100%; display: flex; justify-content: center;">
+        {% csrf_token %}
+
+        {% for question in quiz.questions.all %}
+        <div class="question-container {% if forloop.first %}active{% endif %}" id="q-{{ forloop.counter }}">
+
+            <div class="quiz-progress-text">Question {{ forloop.counter }} of {{ quiz.questions.count }}</div>
+            <div class="question-text">{{ question.text }}</div>
+
+            <div class="options-grid">
+                {% for option in question.options.all %}
+                <label class="option-btn" onclick="selectOption(this, 'q-{{ forloop.parentloop.counter }}')">
+                    <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}"
+                        style="display: none;">
+                    {{ option.text }}
+                </label>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center; width: 100%;">
+                {% if forloop.last %}
+                <button type="button" class="elegant-btn" style="padding: 1rem 3rem; font-size: 1.1rem;"
+                    onclick="submitQuiz()">Complete Challenge</button>
+                {% else %}
+                <button type="button" class="elegant-btn" style="padding: 1rem 3rem; font-size: 1.1rem;"
+                    onclick="nextQuestion({{ forloop.counter }})">Next Question</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+</div>
+
+<script>
+    const totalQuestions = {{ quiz.questions.count }};
+    let currentQuestion = 1;
+
+    // Timer constants
+    const TIME_PER_QUESTION = 15; // seconds
+    let timeLeft = TIME_PER_QUESTION;
+    let timerInterval;
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = TIME_PER_QUESTION;
+        const timerBar = document.getElementById('timerBar');
+
+        // Reset bar
+        timerBar.style.transition = 'none';
+        timerBar.style.width = '100%';
+        timerBar.classList.remove('warning');
+
+        // Force reflow
+        void timerBar.offsetWidth;
+
+        // Start animation
+        timerBar.style.transition = 'width 1s linear, background-color 0.3s ease';
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const percent = (timeLeft / TIME_PER_QUESTION) * 100;
+            timerBar.style.width = percent + '%';
+
+            if (timeLeft <= 5) {
+                timerBar.classList.add('warning');
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                autoAdvance();
+            }
+        }, 1000);
+    }
+
+    function autoAdvance() {
+        if (currentQuestion < totalQuestions) {
+            nextQuestion(currentQuestion, true); // true = forced
+        } else {
+            submitQuiz(true); // force submit
+        }
+    }
+
+    function selectOption(element, containerId) {
+        // Deselect all
+        const container = document.getElementById(containerId);
+        const options = container.querySelectorAll('.option-btn');
+        options.forEach(opt => opt.classList.remove('selected'));
+
+        // Select clicked
+        element.classList.add('selected');
+        element.querySelector('input').checked = true;
+    }
+
+    function nextQuestion(current, forced = false) {
+        const container = document.getElementById(`q-${current}`);
+        const checked = container.querySelector('input:checked');
+
+        if (!checked && !forced) {
+            alert('Please select an option to proceed or wait for the timer to expire.');
+            return;
+        }
+
+        // Hide current
+        container.classList.remove('active');
+
+        // Short delay for transition, then show next
+        setTimeout(() => {
+            currentQuestion = current + 1;
+            document.getElementById(`q-${currentQuestion}`).classList.add('active');
+            startTimer();
+        }, 300);
+    }
+
+    function submitQuiz(forced = false) {
+        const container = document.getElementById(`q-${totalQuestions}`);
+        const checked = container.querySelector('input:checked');
+
+        if (!checked && !forced) {
+            alert('Please select an option to complete the quiz.');
+            return;
+        }
+
+        clearInterval(timerInterval);
+        document.getElementById('quizForm').submit();
+    }
+
+    // Start timer on load
+    document.addEventListener("DOMContentLoaded", () => {
+        if (totalQuestions > 0) {
+            startTimer();
+        }
+    });
+</script>
+{% endblock %}

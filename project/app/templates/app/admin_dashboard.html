@@ -1,0 +1,67 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<div class="dashboard-header"
+    style="margin-bottom: 2.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1.5rem;">
+    <h1 class="text-gradient">Administrator Console</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 5px;">Oversight of all arenas and operatives.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
+    <!-- Quizzes -->
+    <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-main);">All Arenas</h2>
+        {% for quiz in quizzes %}
+        <div class="glass-card" style="margin-bottom: 1rem; padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="color: var(--text-main); font-size: 1.15rem; font-weight: 600;">{{ quiz.title }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Creator: {{
+                        quiz.creator.username }}</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Code: <strong
+                            style="color: var(--accent); letter-spacing: 2px; font-size: 1.1rem;">{{ quiz.join_code
+                            }}</strong></p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Questions: {{
+                        quiz.questions.count }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="glass-card" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No arenas exist yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Users -->
+    <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-main);">Registered Operatives</h2>
+        <div class="glass-card" style="padding: 1.5rem;">
+            <table class="elegant-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Points</th>
+                        <th>Joined Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td style="font-weight: 500;">{{ u.username }}</td>
+                        <td style="color: var(--accent-secondary); font-weight: 600;">{{ u.total_points }}</td>
+                        <td style="color: var(--text-muted); font-size: 0.9rem;">{{ u.date_joined|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No operatives found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
