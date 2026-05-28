@@ -21,5 +21,14 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 
 application = get_wsgi_application()
 
+# --- VERCEL TEMPORARY HACK ---
+# Run migrations automatically on Vercel so the /tmp/db.sqlite3 gets its tables created.
+if os.environ.get('VERCEL') == '1':
+    try:
+        from django.core.management import call_command
+        call_command('migrate', interactive=False)
+    except Exception as e:
+        print(f"Error running migrations on Vercel startup: {e}")
+
 # Vercel looks for an 'app' variable
 app = application
