@@ -37,6 +37,22 @@
         font-family: var(--font-heading);
         line-height: 1.3;
     }
+
+    .option-btn.correct {
+        background: rgba(16, 185, 129, 0.2);
+        border-color: #10b981;
+        color: #10b981;
+    }
+
+    .option-btn.wrong {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    .option-btn.disabled {
+        pointer-events: none;
+    }
 </style>
 
 <div class="quiz-fullscreen-container">
@@ -61,28 +77,28 @@
 
             <div class="options-grid">
                 {% for option in question.options.all %}
-                <label class="option-btn" onclick="selectOption(this, 'q-{{ forloop.parentloop.counter }}')">
+                <label class="option-btn" data-correct="{{ option.is_correct|yesno:'true,false' }}" onclick="selectOption(this, 'q-{{ forloop.parentloop.counter }}', {{ option.is_correct|yesno:'true,false' }}, {{ forloop.parentloop.last|yesno:'true,false' }})">
                     <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}"
                         style="display: none;">
                     {{ option.text }}
                 </label>
                 {% endfor %}
             </div>
-
-            <div style="margin-top: 3rem; text-align: center; width: 100%;">
-                {% if forloop.last %}
-                <div style="margin-bottom: 2rem;">
-                    <input type="text" name="player_name" placeholder="Enter your name (Optional)" class="search-input" style="max-width: 300px; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--accent); background: rgba(0,0,0,0.3); color: white;">
-                </div>
-                <button type="button" class="elegant-btn" style="padding: 1rem 3rem; font-size: 1.1rem;"
-                    onclick="submitQuiz()">Complete Challenge</button>
-                {% else %}
-                <button type="button" class="elegant-btn" style="padding: 1rem 3rem; font-size: 1.1rem;"
-                    onclick="nextQuestion({{ forloop.counter }})">Next Question</button>
-                {% endif %}
-            </div>
         </div>
         {% endfor %}
+
+        <!-- Final Submit Screen -->
+        <div class="question-container" id="q-submit">
+            <div class="question-text" style="color: #10b981; font-size: 3rem;">Arena Completed!</div>
+            <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 1.2rem;">Enter your name to record your score on the global leaderboard.</p>
+            <div style="margin-bottom: 3rem; text-align: center; width: 100%;">
+                <div style="margin-bottom: 2rem;">
+                    <input type="text" name="player_name" placeholder="Enter your name (Optional)" class="search-input" style="max-width: 300px; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--accent); background: rgba(0,0,0,0.3); color: white; text-align: center; font-size: 1.1rem;">
+                </div>
+                <button type="button" class="elegant-btn" style="padding: 1rem 3rem; font-size: 1.1rem;"
+                    onclick="submitQuiz()">Save Score & Finish</button>
+            </div>
+        </div>
     </form>
 </div>
 
@@ -122,59 +138,89 @@
 
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
-                autoAdvance();
+                autoAdvance(currentQuestion, currentQuestion === totalQuestions);
             }
         }, 1000);
     }
 
-    function autoAdvance() {
-        if (currentQuestion < totalQuestions) {
-            nextQuestion(currentQuestion, true); // true = forced
-        } else {
-            submitQuiz(true); // force submit
+    function autoAdvance(current, isLast) {
+        // If timer runs out, just show the correct answer and move on
+        const container = document.getElementById(`q-${current}`);
+        const options = container.querySelectorAll('.option-btn');
+        
+        // Prevent multiple advances
+        if (container.classList.contains('answered')) return;
+        container.classList.add('answered');
+        
+        // Disable all options
+        options.forEach(opt => opt.classList.add('disabled'));
+        
+        // Highlight correct answer
+        const correctOption = Array.from(options).find(opt => opt.getAttribute('data-correct') === 'true');
+        if (correctOption) {
+            correctOption.classList.add('correct');
         }
+
+        setTimeout(() => {
+            nextQuestion(current, isLast);
+        }, 2000);
     }
 
-    function selectOption(element, containerId) {
-        // Deselect all
+    function selectOption(element, containerId, isCorrect, isLast) {
         const container = document.getElementById(containerId);
         const options = container.querySelectorAll('.option-btn');
-        options.forEach(opt => opt.classList.remove('selected'));
+        
+        // Prevent multiple clicks
+        if (container.classList.contains('answered')) return;
+        container.classList.add('answered');
 
-        // Select clicked
-        element.classList.add('selected');
+        // Stop timer
+        clearInterval(timerInterval);
+
+        // Select clicked radio button
         element.querySelector('input').checked = true;
-    }
 
-    function nextQuestion(current, forced = false) {
-        const container = document.getElementById(`q-${current}`);
-        const checked = container.querySelector('input:checked');
+        // Disable all options
+        options.forEach(opt => opt.classList.add('disabled'));
 
-        if (!checked && !forced) {
-            alert('Please select an option to proceed or wait for the timer to expire.');
-            return;
+        // Apply animations
+        if (isCorrect) {
+            element.classList.add('correct');
+        } else {
+            element.classList.add('wrong');
+            // Find and highlight correct answer
+            const correctOption = Array.from(options).find(opt => opt.getAttribute('data-correct') === 'true');
+            if (correctOption) {
+                correctOption.classList.add('correct');
+            }
         }
 
+        // Auto-advance after delay
+        setTimeout(() => {
+            nextQuestion(currentQuestion, isLast);
+        }, 1500);
+    }
+
+    function nextQuestion(current, isLast) {
+        const container = document.getElementById(`q-${current}`);
+        
         // Hide current
         container.classList.remove('active');
 
         // Short delay for transition, then show next
         setTimeout(() => {
-            currentQuestion = current + 1;
-            document.getElementById(`q-${currentQuestion}`).classList.add('active');
-            startTimer();
+            if (isLast) {
+                document.getElementById('q-submit').classList.add('active');
+                document.getElementById('timerBar').parentElement.style.display = 'none'; // Hide timer
+            } else {
+                currentQuestion = current + 1;
+                document.getElementById(`q-${currentQuestion}`).classList.add('active');
+                startTimer();
+            }
         }, 300);
     }
 
-    function submitQuiz(forced = false) {
-        const container = document.getElementById(`q-${totalQuestions}`);
-        const checked = container.querySelector('input:checked');
-
-        if (!checked && !forced) {
-            alert('Please select an option to complete the quiz.');
-            return;
-        }
-
+    function submitQuiz() {
         clearInterval(timerInterval);
         document.getElementById('quizForm').submit();
     }
