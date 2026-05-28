@@ -71,6 +71,9 @@
 
             <div style="margin-top: 3rem; text-align: center; width: 100%;">
                 {% if forloop.last %}
+                <div style="margin-bottom: 2rem;">
+                    <input type="text" name="player_name" placeholder="Enter your name (Optional)" class="search-input" style="max-width: 300px; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--accent); background: rgba(0,0,0,0.3); color: white;">
+                </div>
                 <button type="button" class="elegant-btn" style="padding: 1rem 3rem; font-size: 1.1rem;"
                     onclick="submitQuiz()">Complete Challenge</button>
                 {% else %}

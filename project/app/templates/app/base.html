@@ -20,23 +20,8 @@
         </a>
 
         <div class="nav-links">
-            {% if user.is_authenticated %}
-            <div class="flex-center" style="gap: 12px; margin-right: 1.5rem;">
-                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=8b5cf6&color=fff&bold=true"
-                    alt="Avatar" class="avatar-img">
-                <span style="font-weight: 600; font-size: 0.95rem;">{{ user.username }} | <span
-                        style="color: var(--accent-secondary);">{{ user.total_points }} PTS</span></span>
-            </div>
-            {% if user.is_staff %}
-            <a href="{% url 'admin_dashboard' %}">Admin</a>
-            {% endif %}
             <a href="{% url 'join_quiz' %}">Join Quiz</a>
             <a href="{% url 'create_quiz' %}">Create Quiz</a>
-            <a href="{% url 'logout' %}" style="color: var(--error);">Logout</a>
-            {% else %}
-            <a href="{% url 'login' %}">Sign In</a>
-            <a href="{% url 'register' %}" class="elegant-btn" style="padding: 0.5rem 1.5rem;">Sign Up</a>
-            {% endif %}
         </div>
     </nav>
 

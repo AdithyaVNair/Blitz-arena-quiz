@@ -93,6 +93,13 @@ if 'DATABASE_URL' in os.environ:
         conn_max_age=600,
         conn_health_checks=True,
     )
+elif os.environ.get('VERCEL') == '1':
+    # Temporary hack: Use /tmp on Vercel so the app doesn't crash.
+    # WARNING: Data will be deleted every few hours when the Vercel function restarts.
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/tmp/db.sqlite3',
+    }
 
 
 # Password validation

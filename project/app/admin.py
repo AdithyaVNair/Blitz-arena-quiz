@@ -21,7 +21,7 @@ class QuestionInline(admin.StackedInline):
 
 class QuizAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]
-    list_display = ('title', 'creator', 'join_code', 'created_at')
+    list_display = ('title', 'join_code', 'created_at')
 
 admin.site.register(UserProfile, CustomUserAdmin)
 admin.site.register(Quiz, QuizAdmin)

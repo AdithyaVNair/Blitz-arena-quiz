@@ -28,7 +28,6 @@ class UserProfile(AbstractUser):
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='created_quizzes')
     join_code = models.CharField(max_length=6, unique=True, default=generate_join_code)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -52,11 +51,11 @@ class Option(models.Model):
         return f"{self.text} ({'Correct' if self.is_correct else 'Wrong'})"
 
 class QuizAttempt(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='attempts')
+    player_name = models.CharField(max_length=100, default='Anonymous')
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='attempts')
     score = models.IntegerField(default=0)
     completed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.quiz.title} - {self.score}"
+        return f"{self.player_name} - {self.quiz.title} - {self.score}"
 

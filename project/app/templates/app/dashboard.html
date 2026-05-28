@@ -189,8 +189,8 @@
     style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem;">
     <div>
         <h1 class="text-gradient" style="font-size: 3.5rem; letter-spacing: -1px;">Dashboard</h1>
-        <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: 5px;">Welcome back, <span
-                style="color: white; font-weight: 600;">{{ user.username }}</span></p>
+        <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: 5px;">Welcome to the <span
+                style="color: white; font-weight: 600;">Arena</span></p>
     </div>
     <div style="display: flex; gap: 1rem;">
         <a href="{% url 'join_quiz' %}" class="elegant-btn"
@@ -231,12 +231,12 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
-            Created Arenas
+            All Arenas
         </h2>
 
-        {% if user_quizzes %}
+        {% if all_quizzes %}
         <div id="arenas-list" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 4rem;">
-            {% for quiz in user_quizzes %}
+            {% for quiz in all_quizzes %}
             <div class="glass-card arena-card quiz-item" data-title="{{ quiz.title|lower }}"
                 data-questions="{{ quiz.questions.count }}" data-date="{{ quiz.created_at|date:'U' }}"
                 style="padding: 1.5rem 2rem;">
@@ -344,7 +344,7 @@
                     <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
                     <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>
                 </svg>
-                <h2 style="font-size: 1.4rem; color: var(--text-main); margin: 0;">Global Rank</h2>
+                <h2 style="font-size: 1.4rem; color: var(--text-main); margin: 0;">Recent Battles</h2>
             </div>
 
             <table class="elegant-table">
@@ -355,19 +355,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in top_users %}
+                    {% for attempt in recent_attempts %}
                     <tr>
                         <td style="display: flex; align-items: center; gap: 12px; font-weight: 500; padding-left: 0;">
-                            <img src="https://ui-avatars.com/api/?name={{ p.username }}&background=06b6d4&color=fff&bold=true"
+                            <img src="https://ui-avatars.com/api/?name={{ attempt.player_name }}&background=06b6d4&color=fff&bold=true"
                                 style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1);">
-                            {{ p.username }}
+                            <div>
+                                <div>{{ attempt.player_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ attempt.quiz.title }}</div>
+                            </div>
                             {% if forloop.counter == 1 %}
                             <span
                                 style="font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));">👑</span>
                             {% endif %}
                         </td>
                         <td style="text-align: right; font-weight: 800; color: var(--text-main); padding-right: 0;">
-                            <span class="count-up" data-target="{{ p.total_points }}">0</span>
+                            <span class="count-up" data-target="{{ attempt.score }}">0</span>
                         </td>
                     </tr>
                     {% empty %}
