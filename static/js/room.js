@@ -4,8 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!roomDataEl) return;
 
   const roomCode = roomDataEl.dataset.roomCode;
+  const roomMode = roomDataEl.dataset.roomMode || 'standard';
   const isHost = roomDataEl.dataset.isHost === 'true';
   const currentUsername = roomDataEl.dataset.username;
+
+  // ── Apply dynamic cosmic theme based on room mode ──────────────
+  _applyTheme(roomMode);
 
   // DOM Elements
   const lobbyView = document.getElementById('lobby-view');
@@ -25,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const optionsGrid = document.getElementById('options-grid');
   const scoresRoster = document.getElementById('live-scores-roster');
   const finalLeaderboard = document.getElementById('final-leaderboard');
+  const duelMascots = document.getElementById('duel-mascots');
 
   let timerInterval = null;
   let hasAnsweredCurrentQuestion = false;
@@ -54,6 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (waitingNotice) {
       waitingNotice.style.display = 'flex';
     }
+
+    // Update duel mascot names if in duel mode
+    if (roomMode === 'duel' && data.players.length >= 2) {
+      const p1 = document.getElementById('duel-p1-name');
+      const p2 = document.getElementById('duel-p2-name');
+      if (p1) p1.textContent = data.players[0].name;
+      if (p2) p2.textContent = data.players[1] ? data.players[1].name : 'Opponent';
+    }
   });
 
   // Host clicks Start
@@ -72,6 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lobbyView) lobbyView.style.display = 'none';
     if (gameView) gameView.style.display = 'block';
     if (finishedView) finishedView.style.display = 'none';
+
+    // Show duel mascots in duel mode
+    if (duelMascots && roomMode === 'duel') {
+      duelMascots.style.display = 'flex';
+    }
 
     if (questionIndexEl) questionIndexEl.textContent = data.index;
     if (questionTotalEl) questionTotalEl.textContent = data.total;
@@ -99,12 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (hasAnsweredCurrentQuestion) return;
           hasAnsweredCurrentQuestion = true;
 
-          // Mark selected
           btn.classList.add('selected');
-          // Disable all buttons
           document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
 
-          // Send answer
           socket.send({
             type: 'answer',
             option_id: opt.id
@@ -121,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(timerInterval);
     if (timerBar) timerBar.style.width = '0%';
 
-    // Highlight correct answer
     const correctId = data.correct_option_id;
     document.querySelectorAll('.option-btn').forEach(btn => {
       btn.disabled = true;
@@ -156,6 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gameView) gameView.style.display = 'none';
     if (finishedView) finishedView.style.display = 'block';
 
+    // Remove theme on finish
+    document.body.classList.remove('theme-duel', 'theme-blitz', 'theme-solo');
+
     if (finalLeaderboard && data.scores) {
       finalLeaderboard.innerHTML = '';
       data.scores.forEach((s, idx) => {
@@ -171,12 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
         finalLeaderboard.appendChild(card);
       });
 
-      // Animated count-up
       animateScores();
     }
   });
 
-  // Timer Animation Helper
+  // ── Timer Animation Helper ───────────────────────────────────
   function startTimer(durationSec) {
     if (!timerBar) return;
     timerBar.classList.remove('urgent');
@@ -226,14 +242,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Dynamic theme engine ─────────────────────────────────────
+  function _applyTheme(mode) {
+    document.body.classList.remove('theme-solo', 'theme-duel', 'theme-blitz');
+    const duelBg = document.querySelector('.duel-arena-bg');
+
+    if (mode === 'duel') {
+      document.body.classList.add('theme-duel');
+      if (duelBg) duelBg.style.display = 'block';
+    } else if (mode === 'blitz') {
+      document.body.classList.add('theme-blitz');
+    } else {
+      document.body.classList.add('theme-solo');
+    }
+  }
+
   function getAvatarEmoji(avatar) {
-    const map = {
-      fox: '🦊',
-      knight: '⚔️',
-      owl: '🦉',
-      bear: '🐻',
-      bot: '🤖'
-    };
+    const map = { fox: '🦊', knight: '⚔️', owl: '🦉', bear: '🐻', bot: '🤖' };
     return map[avatar] || '🎮';
   }
 

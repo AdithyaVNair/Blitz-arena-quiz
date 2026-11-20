@@ -8,9 +8,37 @@
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cosmic-theme.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
+  <!-- ═══ Cosmic Background Layers ═══ -->
+  <div class="cosmic-bg" aria-hidden="true">
+    <div class="cosmic-stars"></div>
+    <div class="cosmic-constellation"></div>
+  </div>
+
+  <!-- ═══ Blitz Survival warp streaks (shown via JS / theme-blitz class) ═══ -->
+  <div class="warp-streaks" aria-hidden="true"></div>
+
+  <!-- ═══ Duel Arena split-screen bg ═══ -->
+  <div class="duel-arena-bg" aria-hidden="true" style="display:none;"></div>
+
+  <!-- ═══ Floating STEM Assets ═══ -->
+  <div class="floating-assets" aria-hidden="true">
+    <span class="f-asset planet-1">🪐</span>
+    <span class="f-asset planet-2">🌍</span>
+    <span class="f-asset rocket">🚀</span>
+    <span class="f-asset math-sigma">∑</span>
+    <span class="f-asset math-div">÷</span>
+    <span class="f-asset math-plus">+</span>
+    <span class="f-asset num-1">42</span>
+    <span class="f-asset num-2">π</span>
+    <span class="f-asset drone">🛸</span>
+    <span class="f-asset diamond">💎</span>
+    <div class="f-asset code-block">draw polygon<br>set x = 10<br>repeat 6 ×</div>
+  </div>
+
   {% include 'components/navbar.html' %}
 
   <main class="main-content">
@@ -24,4 +52,3 @@
   {% block extra_js %}{% endblock %}
 </body>
 </html>
-

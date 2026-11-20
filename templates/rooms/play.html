@@ -10,6 +10,7 @@
 {% block content %}
 <div id="room-meta"
      data-room-code="{{ room.code }}"
+     data-room-mode="{{ room.mode }}"
      data-is-host="{{ is_host|yesno:'true,false' }}"
      data-username="{{ request.user.username }}">
 </div>
@@ -18,7 +19,7 @@
 <div id="lobby-view" class="arena-section">
   <div class="page-header">
     <div class="badge badge-accent">
-      {% if room.mode == 'duel' %}1v1 Duel Lobby{% else %}Group Match Lobby{% endif %}
+      {% if room.mode == 'duel' %}⚡ 1v1 Duel Lobby{% else %}🌌 Group Match Lobby{% endif %}
     </div>
     <h1 class="page-title">{{ quiz.title }}</h1>
     <p class="page-subtitle">Share the code below with your rivals. Live sync starts when host launches.</p>
@@ -29,10 +30,10 @@
       <span class="stat-label">Room Access Code</span>
       <div class="code-display">{{ room.code }}</div>
       <p class="card-subtitle">Tell players to visit <code>/rooms/join/</code> and enter code <strong>{{ room.code }}</strong></p>
-      
+
       {% if is_host %}
         <div class="host-controls">
-          <button id="start-game-btn" class="btn btn-primary btn-block">&#9658; Start Battle Now</button>
+          <button id="start-game-btn" class="btn btn-primary btn-block">▶ Start Battle Now</button>
         </div>
       {% else %}
         <div id="waiting-notice" class="waiting-box">
@@ -70,6 +71,19 @@
 
 <!-- LIVE GAME SCREEN -->
 <div id="game-view" class="arena-section" style="display: none;">
+  <!-- Duel mascots (shown in duel mode via JS) -->
+  <div id="duel-mascots" class="duel-mascots-row" style="display:none;">
+    <div class="duel-mascot-left">
+      <span style="font-size:2.5rem;" aria-hidden="true">🤖</span>
+      <span class="duel-player-label" id="duel-p1-name">Player 1</span>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="duel-mascot-right">
+      <span style="font-size:2.5rem;" aria-hidden="true">🤖</span>
+      <span class="duel-player-label" id="duel-p2-name">Player 2</span>
+    </div>
+  </div>
+
   <div class="play-screen">
     <div class="question-header">
       <div class="question-tracker">
@@ -108,7 +122,7 @@
 <!-- FINISHED SCREEN -->
 <div id="finished-view" class="arena-section" style="display: none;">
   <div class="page-header text-center">
-    <div class="badge badge-good">Battle Complete</div>
+    <div class="badge badge-good">🏆 Battle Complete</div>
     <h1 class="page-title">Arena Champions</h1>
     <p class="page-subtitle">The gauntlet has concluded. Here are the final scores and rankings.</p>
   </div>

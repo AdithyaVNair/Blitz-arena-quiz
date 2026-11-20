@@ -8,7 +8,8 @@
   <div class="page-header">
     <div class="badge badge-accent">&#9889; Neural Engine</div>
     <h1 class="page-title">AI Quiz Generator</h1>
-    <p class="page-subtitle">Describe any topic, era, game, or concept. Our AI will craft an arena-ready trivia quiz in seconds.</p>
+    <p class="page-subtitle">Describe any topic, era, game, or concept. Our AI will craft an arena-ready trivia quiz in
+      seconds.</p>
   </div>
 
   <div id="ai-form-card" class="card">
@@ -17,20 +18,24 @@
 
       <div class="form-group">
         <label class="form-label" for="prompt">What should your quiz be about?</label>
-        <textarea name="prompt" id="prompt" rows="3" class="form-control" placeholder="e.g. 90s FPS video games like Doom, Quake, and Half-Life, focusing on weapons, levels, and speedrunning lore." required>{{ initial_prompt|default:'' }}</textarea>
+        <textarea name="prompt" id="prompt" rows="3" class="form-control"
+          placeholder="e.g. 90s FPS video games like Doom, Quake, and Half-Life, focusing on weapons, levels, and speedrunning lore."
+          required>{{ initial_prompt|default:'' }}</textarea>
       </div>
 
       <div class="form-row-2">
         <div class="form-group">
           <label class="form-label" for="count">Number of Questions (5–20)</label>
-          <input type="number" name="count" id="count" min="5" max="20" value="{{ initial_count|default:'5' }}" class="form-control" required>
+          <input type="number" name="count" id="count" min="5" max="20" value="{{ initial_count|default:'5' }}"
+            class="form-control" required>
         </div>
         <div class="form-group">
           <label class="form-label" for="difficulty">Difficulty Tier</label>
           <select name="difficulty" id="difficulty" class="form-select">
-            <option value="easy" {% if initial_difficulty == 'easy' %}selected{% endif %}>Easy (Casual Fun)</option>
-            <option value="medium" {% if not initial_difficulty or initial_difficulty == 'medium' %}selected{% endif %}>Medium (Balanced Challenge)</option>
-            <option value="hard" {% if initial_difficulty == 'hard' %}selected{% endif %}>Hard (Hardcore Trivia)</option>
+            <option value="easy" {% if initial_difficulty=='easy' %}selected{% endif %}>Easy (Casual Fun)</option>
+            <option value="medium" {% if not initial_difficulty or initial_difficulty=='medium' %}selected{% endif %}>
+              Medium (Balanced Challenge)</option>
+            <option value="hard" {% if initial_difficulty=='hard' %}selected{% endif %}>Hard (Hardcore Trivia)</option>
           </select>
         </div>
       </div>
@@ -51,16 +56,16 @@
 
     <!-- 5 Skeleton Question Cards with Shimmer -->
     {% for i in "12345" %}
-      <div class="card skeleton-card">
-        <div class="skeleton-line skeleton-title"></div>
-        <div class="skeleton-line skeleton-subtitle"></div>
-        <div class="skeleton-options-grid">
-          <div class="skeleton-line skeleton-opt"></div>
-          <div class="skeleton-line skeleton-opt"></div>
-          <div class="skeleton-line skeleton-opt"></div>
-          <div class="skeleton-line skeleton-opt"></div>
-        </div>
+    <div class="card skeleton-card">
+      <div class="skeleton-line skeleton-title"></div>
+      <div class="skeleton-line skeleton-subtitle"></div>
+      <div class="skeleton-options-grid">
+        <div class="skeleton-line skeleton-opt"></div>
+        <div class="skeleton-line skeleton-opt"></div>
+        <div class="skeleton-line skeleton-opt"></div>
+        <div class="skeleton-line skeleton-opt"></div>
       </div>
+    </div>
     {% endfor %}
   </div>
 </div>

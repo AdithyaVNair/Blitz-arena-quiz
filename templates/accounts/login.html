@@ -4,13 +4,23 @@
 
 {% block content %}
 <div class="auth-wrapper">
-  <div class="page-header">
+  <div class="page-header" style="text-align:center;">
     <div class="badge badge-accent">Battle Gate</div>
-    <h1 class="page-title">Arena Access</h1>
-    <p class="page-subtitle">Enter your credentials to enter the live multiplayer arena.</p>
+    <h1 class="page-title" style="justify-content:center;">⚡ Arena Access</h1>
+    <p class="page-subtitle">Enter your credentials to join the live multiplayer arena.</p>
   </div>
 
-  <div class="auth-card">
+  <!-- Cosmic card with mascots -->
+  <div class="auth-card auth-card-cosmic">
+    <!-- Robot mascots perched on card edges -->
+    <div class="mascot mascot-left" aria-hidden="true">
+      <span class="mascot-eyes">🤖</span>
+    </div>
+    <div class="mascot mascot-right" aria-hidden="true">
+      <span class="mascot-eyes">🐾</span>
+    </div>
+
+    <!-- Google Sign-In -->
     <a href="{% url 'google_login' %}" class="btn-google">
       <svg class="google-icon" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -50,7 +60,7 @@
         {% endif %}
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block">Enter Arena</button>
+      <button type="submit" class="btn btn-primary btn-block">🚀 Enter Arena</button>
     </form>
 
     <div class="auth-footer">
