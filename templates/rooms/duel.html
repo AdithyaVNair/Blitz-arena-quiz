@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}1v1 Duel Arena — Blitz Arena{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="badge badge-accent">Head-to-Head</div>
+  <h1 class="page-title">1v1 Duel Arena</h1>
+  <p class="page-subtitle">Test your speed and precision against another live player in real-time combat.</p>
+</div>
+
+<div class="duel-grid">
+  <!-- Matchmaking Column -->
+  <div class="card duel-card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Quick Matchmaking</h2>
+        <p class="card-subtitle">Queue up to instantly match against another waiting challenger.</p>
+      </div>
+    </div>
+
+    {% csrf_token %}
+
+    <div id="matchmaking-idle">
+      <div class="form-group">
+        <label class="form-label" for="duel-quiz-select">Select Arena Topic (Optional)</label>
+        <select id="duel-quiz-select" class="form-select">
+          <option value="">Any Public Topic (Fastest Match)</option>
+          {% for q in quizzes %}
+            <option value="{{ q.id }}">{{ q.title }} ({{ q.topic }})</option>
+          {% endfor %}
+        </select>
+        <div class="form-help">Leave on "Any" for the quickest matching queue.</div>
+      </div>
+
+      <button id="find-opponent-btn" class="btn btn-primary btn-block">&#9876; Find Opponent</button>
+    </div>
+
+    <!-- Active Searching State -->
+    <div id="matchmaking-active" style="display: none;" class="matchmaking-searching-box">
+      <div class="pulse-ring" aria-hidden="true"></div>
+      <h3>Searching for Challenger...</h3>
+      <p class="card-subtitle">Elapsed time: <strong id="elapsed-seconds">0s</strong></p>
+      <button id="cancel-matchmaking-btn" class="btn btn-danger btn-sm">Cancel Search</button>
+    </div>
+  </div>
+
+  <!-- Direct Challenge Column -->
+  <div class="card duel-card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Challenge a Friend by Code</h2>
+        <p class="card-subtitle">Generate a private 1v1 room code and send it directly to a friend.</p>
+      </div>
+    </div>
+
+    <p>Choose a quiz arena to generate a direct 1v1 battle code:</p>
+
+    <div class="challenge-quizzes-list">
+      {% for q in quizzes|slice:":5" %}
+        <div class="challenge-item">
+          <div>
+            <strong>{{ q.title }}</strong>
+            <span class="badge">{{ q.topic }}</span>
+          </div>
+          <a href="{% url 'create_duel_challenge' q.id %}" class="btn btn-secondary btn-sm">Create Code</a>
+        </div>
+      {% empty %}
+        <p class="text-muted">No quizzes available yet. <a href="{% url 'create_quiz' %}">Create a quiz</a> to start duels.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/duel.js' %}"></script>
+{% endblock %}

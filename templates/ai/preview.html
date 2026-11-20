@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Preview AI Quiz — Blitz Arena{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper form-wrapper-lg">
+  <div class="page-header">
+    <div class="badge badge-accent">&#9889; AI Draft Review</div>
+    <h1 class="page-title">Editable Quiz Preview</h1>
+    <p class="page-subtitle">Review the AI-generated questions and answers below. You can edit any text before saving. Nothing is saved until you click Save.</p>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="card">
+      <h2 class="card-title">Quiz Details</h2>
+      <div class="form-group">
+        <label class="form-label" for="quiz-title">Quiz Title</label>
+        <input type="text" name="title" id="quiz-title" value="{{ quiz.title }}" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="quiz-topic">Category Topic</label>
+        <input type="text" name="topic" id="quiz-topic" value="{{ quiz.topic }}" class="form-control" required>
+      </div>
+    </div>
+
+    <h2>Generated Questions ({{ quiz.questions|length }})</h2>
+
+    {% for q in quiz.questions %}
+      <div class="card question-preview-card">
+        <div class="card-header">
+          <span class="badge">#{{ forloop.counter }}</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Question Text</label>
+          <textarea name="q_{{ forloop.counter }}_text" rows="2" class="form-control" required>{{ q.text }}</textarea>
+        </div>
+
+        <div class="options-form-section">
+          <label class="form-label">Options & Correct Answer</label>
+          <div class="option-form-item opt-item-a">
+            <div class="option-indicator">
+              <input type="radio" name="q_{{ forloop.counter }}_correct" value="0" id="q_{{ forloop.counter }}_opt_0" {% if q.correct_index == 0 %}checked{% endif %}>
+              <label for="q_{{ forloop.counter }}_opt_0" class="radio-tag">Option A (Blue)</label>
+            </div>
+            <input type="text" name="q_{{ forloop.counter }}_opt_0" value="{{ q.options.0 }}" class="form-control" required>
+          </div>
+
+          <div class="option-form-item opt-item-b">
+            <div class="option-indicator">
+              <input type="radio" name="q_{{ forloop.counter }}_correct" value="1" id="q_{{ forloop.counter }}_opt_1" {% if q.correct_index == 1 %}checked{% endif %}>
+              <label for="q_{{ forloop.counter }}_opt_1" class="radio-tag">Option B (Orange)</label>
+            </div>
+            <input type="text" name="q_{{ forloop.counter }}_opt_1" value="{{ q.options.1 }}" class="form-control" required>
+          </div>
+
+          <div class="option-form-item opt-item-c">
+            <div class="option-indicator">
+              <input type="radio" name="q_{{ forloop.counter }}_correct" value="2" id="q_{{ forloop.counter }}_opt_2" {% if q.correct_index == 2 %}checked{% endif %}>
+              <label for="q_{{ forloop.counter }}_opt_2" class="radio-tag">Option C (Green)</label>
+            </div>
+            <input type="text" name="q_{{ forloop.counter }}_opt_2" value="{{ q.options.2 }}" class="form-control" required>
+          </div>
+
+          <div class="option-form-item opt-item-d">
+            <div class="option-indicator">
+              <input type="radio" name="q_{{ forloop.counter }}_correct" value="3" id="q_{{ forloop.counter }}_opt_3" {% if q.correct_index == 3 %}checked{% endif %}>
+              <label for="q_{{ forloop.counter }}_opt_3" class="radio-tag">Option D (Violet)</label>
+            </div>
+            <input type="text" name="q_{{ forloop.counter }}_opt_3" value="{{ q.options.3 }}" class="form-control" required>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="form-actions sticky-actions">
+      <button type="submit" name="save_quiz" class="btn btn-primary">&#10004; Save to My Quizzes</button>
+      <button type="submit" name="discard_quiz" class="btn btn-secondary" onclick="return confirm('Discard this preview?');">Discard Draft</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

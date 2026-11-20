@@ -1,8 +1,9 @@
-Django>=5.0
-djangorestframework
-djangorestframework-simplejwt
-django-cors-headers
-django-filter
-whitenoise
-dj-database-url
-psycopg2-binary
+Django>=5.0,<6
+mysqlclient
+channels
+channels-redis
+daphne
+django-environ
+anthropic
+google-genai
+pytest-django

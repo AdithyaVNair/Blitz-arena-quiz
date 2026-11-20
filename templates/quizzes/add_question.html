@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Question — {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper form-wrapper-lg">
+  <div class="page-header">
+    <div class="badge badge-accent">Quiz: {{ quiz.title }}</div>
+    <h1 class="page-title">Add Question #{{ current_count|add:1 }}</h1>
+    <p class="page-subtitle">Provide the challenge prompt, time limit, and exactly 4 options. Mark the correct answer.</p>
+  </div>
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.text.id_for_label }}">Question Text</label>
+        {{ form.text }}
+        {% if form.text.errors %}<div class="form-error">{{ form.text.errors }}</div>{% endif %}
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.time_limit.id_for_label }}">Time Limit (Seconds)</label>
+          {{ form.time_limit }}
+          {% if form.time_limit.errors %}<div class="form-error">{{ form.time_limit.errors }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.points.id_for_label }}">Base Points</label>
+          {{ form.points }}
+          {% if form.points.errors %}<div class="form-error">{{ form.points.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="options-form-section">
+        <label class="form-label">Four Answer Options (Select Correct Answer)</label>
+        <p class="form-help">Click the radio button on the option that represents the correct answer.</p>
+
+        <div class="option-form-item opt-item-a">
+          <div class="option-indicator">
+            <input type="radio" name="correct_option" value="0" id="opt_radio_0" checked>
+            <label for="opt_radio_0" class="radio-tag">Option A (Blue)</label>
+          </div>
+          {{ form.option_0 }}
+          {% if form.option_0.errors %}<div class="form-error">{{ form.option_0.errors }}</div>{% endif %}
+        </div>
+
+        <div class="option-form-item opt-item-b">
+          <div class="option-indicator">
+            <input type="radio" name="correct_option" value="1" id="opt_radio_1">
+            <label for="opt_radio_1" class="radio-tag">Option B (Orange)</label>
+          </div>
+          {{ form.option_1 }}
+          {% if form.option_1.errors %}<div class="form-error">{{ form.option_1.errors }}</div>{% endif %}
+        </div>
+
+        <div class="option-form-item opt-item-c">
+          <div class="option-indicator">
+            <input type="radio" name="correct_option" value="2" id="opt_radio_2">
+            <label for="opt_radio_2" class="radio-tag">Option C (Green)</label>
+          </div>
+          {{ form.option_2 }}
+          {% if form.option_2.errors %}<div class="form-error">{{ form.option_2.errors }}</div>{% endif %}
+        </div>
+
+        <div class="option-form-item opt-item-d">
+          <div class="option-indicator">
+            <input type="radio" name="correct_option" value="3" id="opt_radio_3">
+            <label for="opt_radio_3" class="radio-tag">Option D (Violet)</label>
+          </div>
+          {{ form.option_3 }}
+          {% if form.option_3.errors %}<div class="form-error">{{ form.option_3.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" name="save_and_add_another" class="btn btn-primary">+ Save & Add Next Question</button>
+        <button type="submit" name="save_and_finish" class="btn btn-secondary">Save & Finish</button>
+        <a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-secondary">Back to Quiz</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

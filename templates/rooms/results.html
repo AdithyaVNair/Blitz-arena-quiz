@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Match Results — {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+  <div class="badge badge-good">Results Certified</div>
+  <h1 class="page-title">{{ quiz.title }} — Match Final</h1>
+  <p class="page-subtitle">Final scores recorded and XP distributed.</p>
+</div>
+
+<div class="results-wrapper">
+  <div class="card">
+    <h2 class="card-title">Scoreboard Summary</h2>
+    <div class="leaderboard-table">
+      <div class="leaderboard-header-row">
+        <span class="col-rank">Rank</span>
+        <span class="col-player">Contender</span>
+        <span class="col-xp">Points</span>
+      </div>
+
+      {% for p in players %}
+        <div class="leaderboard-row {% if forloop.counter == 1 %}top-rank rank-1{% endif %}">
+          <span class="col-rank">#{{ forloop.counter }}</span>
+          <span class="col-player font-bold">
+            {% if p.user.avatar == 'fox' %}🦊
+            {% elif p.user.avatar == 'knight' %}⚔️
+            {% elif p.user.avatar == 'owl' %}🦉
+            {% elif p.user.avatar == 'bear' %}🐻
+            {% elif p.user.avatar == 'bot' %}🤖
+            {% endif %}
+            {{ p.user.username }}
+          </span>
+          <span class="col-xp badge badge-accent">{{ p.score }} pts</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="card-actions">
+      <a href="/quizzes/" class="btn btn-primary">My Quizzes</a>
+      <a href="/rooms/duel/" class="btn btn-accent">Queue 1v1 Duel</a>
+      <a href="/rooms/leaderboard/" class="btn btn-secondary">Global Ranks</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard — Blitz Arena{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="badge badge-accent">Hall of Fame</div>
+  <h1 class="page-title">Global Arena Leaderboard</h1>
+  <p class="page-subtitle">The most formidable quiz masters ranked by lifetime battle XP.</p>
+</div>
+
+<div class="card leaderboard-card">
+  <div class="leaderboard-table">
+    <div class="leaderboard-header-row">
+      <span class="col-rank">Rank</span>
+      <span class="col-player">Player</span>
+      <span class="col-avatar">Avatar</span>
+      <span class="col-xp">Arena XP</span>
+    </div>
+
+    {% for p in players %}
+      <div class="leaderboard-row {% if forloop.counter <= 3 %}top-rank rank-{{ forloop.counter }}{% endif %}">
+        <span class="col-rank">
+          {% if forloop.counter == 1 %}🥇 #1
+          {% elif forloop.counter == 2 %}🥈 #2
+          {% elif forloop.counter == 3 %}🥉 #3
+          {% else %}#{{ forloop.counter }}
+          {% endif %}
+        </span>
+        <span class="col-player font-bold">{{ p.username }}</span>
+        <span class="col-avatar">
+          {% if p.avatar == 'fox' %}🦊 Cyber Fox
+          {% elif p.avatar == 'knight' %}⚔️ Knight
+          {% elif p.avatar == 'owl' %}🦉 Neon Owl
+          {% elif p.avatar == 'bear' %}🐻 Cosmo Bear
+          {% elif p.avatar == 'bot' %}🤖 Turbo Bot
+          {% else %}🎮 Player
+          {% endif %}
+        </span>
+        <span class="col-xp badge badge-accent">{{ p.xp }} XP</span>
+      </div>
+    {% empty %}
+      <p class="text-muted">No players ranked yet. Play matches to earn XP!</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

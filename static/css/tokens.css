@@ -1,0 +1,46 @@
+/* tokens.css - ONLY place for colours, typography, borders, shadows */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #F4EFE6;         /* warm retro gaming cream */
+  --surface: #FFFFFF;
+  --surface-alt: #FDFBF7;
+  --ink: #18181B;        /* crisp obsidian black */
+  --muted: #64748B;
+  --muted-light: #94A3B8;
+  --accent: #FF4D2E;     /* energetic tomato red */
+  --accent-hover: #E63E20;
+  --accent-2: #FFD23F;   /* arcade yellow highlight */
+  --good: #10B981;       /* victory green */
+  --bad: #EF4444;        /* game-over red */
+
+  /* Four answer colours */
+  --opt-a: #3B82F6;      /* sapphire blue */
+  --opt-b: #F97316;      /* blaze orange */
+  --opt-c: #10B981;      /* emerald green */
+  --opt-d: #8B5CF6;      /* royal violet */
+
+  --border: 2.5px solid var(--ink);
+  --border-thin: 1.5px solid var(--ink);
+  --shadow: 4px 4px 0 var(--ink);
+  --shadow-lg: 6px 6px 0 var(--ink);
+  --shadow-sm: 2px 2px 0 var(--ink);
+  --shadow-hover: 2px 2px 0 var(--ink);
+  --shadow-active: 0px 0px 0 var(--ink);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-full: 9999px;
+
+  --font-head: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Spacing Scale */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+}

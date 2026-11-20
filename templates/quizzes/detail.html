@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ quiz.title }} — Blitz Arena{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-flex">
+    <div>
+      <div class="badge badge-accent">{{ quiz.topic }}</div>
+      <h1 class="page-title">{{ quiz.title }}</h1>
+      <p class="page-subtitle">
+        {{ quiz.questions.count }} Question{{ quiz.questions.count|pluralize }} &bull; Author: {{ quiz.owner.username }}
+        {% if quiz.is_public %}&bull; <span class="badge badge-good">Public</span>{% else %}&bull; <span class="badge">Private</span>{% endif %}
+      </p>
+    </div>
+    <div class="header-actions">
+      <a href="/rooms/create/{{ quiz.id }}/" class="btn btn-primary">&#9658; Host Live Room</a>
+      {% if is_owner %}
+        <a href="{% url 'add_question' quiz.id %}" class="btn btn-accent">+ Add Question</a>
+        <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-secondary">Edit Details</a>
+        <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-danger btn-sm">Delete Quiz</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="questions-section">
+  <h2>Questions Roster</h2>
+
+  {% if quiz.questions.all %}
+    <div class="question-list">
+      {% for question in quiz.questions.all %}
+        <div class="card question-preview-card">
+          <div class="card-header">
+            <div>
+              <span class="badge">#{{ question.order }}</span>
+              <span class="badge">{{ question.time_limit }}s</span>
+              <span class="badge">{{ question.points }} pts</span>
+              <h3 class="card-title question-text-preview">{{ question.text }}</h3>
+            </div>
+            {% if is_owner %}
+              <form method="post" action="{% url 'delete_question' quiz.id question.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this question?');">Delete</button>
+              </form>
+            {% endif %}
+          </div>
+
+          <div class="options-preview-grid">
+            {% for opt in question.options.all %}
+              <div class="option-preview-item {% if forloop.counter0 == 0 %}opt-item-a{% elif forloop.counter0 == 1 %}opt-item-b{% elif forloop.counter0 == 2 %}opt-item-c{% else %}opt-item-d{% endif %} {% if opt.is_correct %}opt-correct{% endif %}">
+                <span class="opt-letter">
+                  {% if forloop.counter0 == 0 %}A{% elif forloop.counter0 == 1 %}B{% elif forloop.counter0 == 2 %}C{% else %}D{% endif %}
+                </span>
+                <span class="opt-text">{{ opt.text }}</span>
+                {% if opt.is_correct %}
+                  <span class="correct-tag">&#10003; Correct</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state-card">
+      <h3 class="card-title">This Quiz Has No Questions Yet</h3>
+      <p class="card-subtitle">Every quiz in Blitz Arena needs at least one question with 4 options to be playable.</p>
+      {% if is_owner %}
+        <a href="{% url 'add_question' quiz.id %}" class="btn btn-primary">Add Question Now</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

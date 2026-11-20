@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Room {{ room.code }} — Blitz Arena{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/play.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="room-meta"
+     data-room-code="{{ room.code }}"
+     data-is-host="{{ is_host|yesno:'true,false' }}"
+     data-username="{{ request.user.username }}">
+</div>
+
+<!-- LOBBY SCREEN -->
+<div id="lobby-view" class="arena-section">
+  <div class="page-header">
+    <div class="badge badge-accent">
+      {% if room.mode == 'duel' %}1v1 Duel Lobby{% else %}Group Match Lobby{% endif %}
+    </div>
+    <h1 class="page-title">{{ quiz.title }}</h1>
+    <p class="page-subtitle">Share the code below with your rivals. Live sync starts when host launches.</p>
+  </div>
+
+  <div class="lobby-grid">
+    <div class="card code-card">
+      <span class="stat-label">Room Access Code</span>
+      <div class="code-display">{{ room.code }}</div>
+      <p class="card-subtitle">Tell players to visit <code>/rooms/join/</code> and enter code <strong>{{ room.code }}</strong></p>
+      
+      {% if is_host %}
+        <div class="host-controls">
+          <button id="start-game-btn" class="btn btn-primary btn-block">&#9658; Start Battle Now</button>
+        </div>
+      {% else %}
+        <div id="waiting-notice" class="waiting-box">
+          <div class="bouncing-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="waiting-text">Waiting for host to launch the match...</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="card roster-card">
+      <div class="card-header">
+        <h2 class="card-title">Players in Room (<span id="player-count">{{ room.players.count }}</span>)</h2>
+      </div>
+      <div id="player-roster" class="player-chips-list">
+        {% for p in room.players.all %}
+          <div class="player-chip">
+            <span class="player-avatar">
+              {% if p.user.avatar == 'fox' %}🦊
+              {% elif p.user.avatar == 'knight' %}⚔️
+              {% elif p.user.avatar == 'owl' %}🦉
+              {% elif p.user.avatar == 'bear' %}🐻
+              {% elif p.user.avatar == 'bot' %}🤖
+              {% else %}🎮
+              {% endif %}
+            </span>
+            <span class="player-name">{{ p.user.username }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE GAME SCREEN -->
+<div id="game-view" class="arena-section" style="display: none;">
+  <div class="play-screen">
+    <div class="question-header">
+      <div class="question-tracker">
+        <span class="badge badge-accent">Question <span id="question-index">1</span> of <span id="question-total">5</span></span>
+      </div>
+      <div class="time-display">
+        <span class="badge" id="timer-remaining-text">20s</span>
+      </div>
+    </div>
+
+    <!-- Timer Bar -->
+    <div class="timer-container">
+      <div id="timer-bar" class="timer-bar"></div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="question-card">
+      <h2 id="question-text" class="question-text">Loading question prompt...</h2>
+    </div>
+
+    <!-- 4 Options Grid -->
+    <div id="options-grid" class="options-grid">
+      <!-- Options dynamically rendered by room.js -->
+    </div>
+
+    <!-- Live Scores Strip -->
+    <div class="card live-scores-card">
+      <h3 class="card-title">Live Scoreboard</h3>
+      <div id="live-scores-roster" class="live-scores-grid">
+        <!-- Live scores populated on reveal -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FINISHED SCREEN -->
+<div id="finished-view" class="arena-section" style="display: none;">
+  <div class="page-header text-center">
+    <div class="badge badge-good">Battle Complete</div>
+    <h1 class="page-title">Arena Champions</h1>
+    <p class="page-subtitle">The gauntlet has concluded. Here are the final scores and rankings.</p>
+  </div>
+
+  <div id="final-leaderboard" class="podium-grid">
+    <!-- Populated by room.js -->
+  </div>
+
+  <div class="finished-actions">
+    <a href="/quizzes/" class="btn btn-primary">Back to Quizzes</a>
+    <a href="/rooms/leaderboard/" class="btn btn-secondary">Global Leaderboard</a>
+    <a href="/rooms/duel/" class="btn btn-accent">Queue Another 1v1</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ws.js' %}"></script>
+<script src="{% static 'js/room.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}My Quizzes — Blitz Arena{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="badge badge-accent">Creator Hub</div>
+  <div class="page-header-flex">
+    <div>
+      <h1 class="page-title">My Quizzes</h1>
+      <p class="page-subtitle">Quizzes you have authored and prepared for arena combat.</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'create_quiz' %}" class="btn btn-primary">+ Create Quiz</a>
+      <a href="/ai/generate/" class="btn btn-accent">&#9889; AI Quiz Generator</a>
+    </div>
+  </div>
+</div>
+
+{% if quizzes %}
+  <div class="quiz-grid">
+    {% for quiz in quizzes %}
+      <div class="card quiz-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">{{ quiz.title }}</h3>
+            <span class="badge">{{ quiz.topic }}</span>
+            {% if quiz.created_by_ai %}
+              <span class="badge badge-accent">AI Generated</span>
+            {% endif %}
+            {% if not quiz.is_public %}
+              <span class="badge">Private</span>
+            {% endif %}
+          </div>
+        </div>
+        <p class="card-subtitle">
+          {{ quiz.questions.count }} Question{{ quiz.questions.count|pluralize }} &bull; Created {{ quiz.created_at|date:"M d, Y" }}
+        </p>
+        <div class="card-actions">
+          <a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-secondary btn-sm">Manage Questions</a>
+          <a href="/rooms/create/{{ quiz.id }}/" class="btn btn-primary btn-sm">&#9658; Host Game</a>
+          <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-secondary btn-sm">Edit</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card empty-state-card">
+    <h2 class="card-title">No Quizzes Created Yet</h2>
+    <p class="card-subtitle">Craft your own trivia gauntlet or generate one instantly using our AI quiz engine.</p>
+    <div class="card-actions">
+      <a href="{% url 'create_quiz' %}" class="btn btn-primary">Create Your First Quiz</a>
+      <a href="/ai/generate/" class="btn btn-accent">Generate with AI</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action_title }} — Blitz Arena{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper form-wrapper-lg">
+  <div class="page-header">
+    <div class="badge badge-accent">Quiz Editor</div>
+    <h1 class="page-title">{{ action_title }}</h1>
+    <p class="page-subtitle">Configure the meta settings and privacy of your quiz arena.</p>
+  </div>
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.title.id_for_label }}">Quiz Title</label>
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="form-error">{{ form.title.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.topic.id_for_label }}">Category / Topic</label>
+        {{ form.topic }}
+        <div class="form-help">e.g. History, Video Games, Anime, Web Tech, Science</div>
+        {% if form.topic.errors %}
+          <div class="form-error">{{ form.topic.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          {{ form.is_public }}
+          <span>Publish on Public Explore page</span>
+        </label>
+        <div class="form-help">Uncheck to keep this quiz private (accessible only via direct room code).</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+        <a href="{% url 'my_quizzes' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

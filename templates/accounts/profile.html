@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }} — Profile{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+  <div class="page-header">
+    <div class="badge badge-accent">Player Dossier</div>
+    <h1 class="page-title">
+      <span>{{ user.username }}</span>
+      {% if user.avatar == 'fox' %}🦊
+      {% elif user.avatar == 'knight' %}⚔️
+      {% elif user.avatar == 'owl' %}🦉
+      {% elif user.avatar == 'bear' %}🐻
+      {% elif user.avatar == 'bot' %}🤖
+      {% endif %}
+    </h1>
+    <p class="page-subtitle">Manage your arena identity, live XP rank, and combat persona.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-label">Total Arena XP</span>
+      <h2 class="stat-value">{{ user.xp }}</h2>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Active Persona</span>
+      <h2 class="stat-value">{{ user.avatar|title }}</h2>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Rank Status</span>
+      <h2 class="stat-value">
+        {% if user.xp >= 1000 %}WARLORD
+        {% elif user.xp >= 500 %}GLADIATOR
+        {% elif user.xp >= 100 %}CHALLENGER
+        {% else %}RECRUIT
+        {% endif %}
+      </h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Change Persona Avatar</h2>
+        <p class="card-subtitle">Choose your avatar representation for 1v1 duels and lobby rooms.</p>
+      </div>
+    </div>
+    
+    <form method="post" action="{% url 'profile' %}">
+      {% csrf_token %}
+      <div class="avatar-selector-grid">
+        <label class="avatar-card {% if user.avatar == 'fox' %}active{% endif %}" data-avatar="fox">
+          <input type="radio" name="avatar" value="fox" {% if user.avatar == 'fox' %}checked{% endif %} class="avatar-radio-hidden">
+          <span class="avatar-emoji">🦊</span>
+          <span class="avatar-name">Cyber Fox</span>
+        </label>
+        <label class="avatar-card {% if user.avatar == 'knight' %}active{% endif %}" data-avatar="knight">
+          <input type="radio" name="avatar" value="knight" {% if user.avatar == 'knight' %}checked{% endif %} class="avatar-radio-hidden">
+          <span class="avatar-emoji">⚔️</span>
+          <span class="avatar-name">Knight</span>
+        </label>
+        <label class="avatar-card {% if user.avatar == 'owl' %}active{% endif %}" data-avatar="owl">
+          <input type="radio" name="avatar" value="owl" {% if user.avatar == 'owl' %}checked{% endif %} class="avatar-radio-hidden">
+          <span class="avatar-emoji">🦉</span>
+          <span class="avatar-name">Neon Owl</span>
+        </label>
+        <label class="avatar-card {% if user.avatar == 'bear' %}active{% endif %}" data-avatar="bear">
+          <input type="radio" name="avatar" value="bear" {% if user.avatar == 'bear' %}checked{% endif %} class="avatar-radio-hidden">
+          <span class="avatar-emoji">🐻</span>
+          <span class="avatar-name">Cosmo Bear</span>
+        </label>
+        <label class="avatar-card {% if user.avatar == 'bot' %}active{% endif %}" data-avatar="bot">
+          <input type="radio" name="avatar" value="bot" {% if user.avatar == 'bot' %}checked{% endif %} class="avatar-radio-hidden">
+          <span class="avatar-emoji">🤖</span>
+          <span class="avatar-name">Turbo Bot</span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-secondary">Update Persona</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Arena Fast Pass</h2>
+        <p class="card-subtitle">Jump straight into action.</p>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="/quizzes/" class="btn btn-primary">My Quizzes</a>
+      <a href="/quizzes/explore/" class="btn btn-secondary">Explore Quizzes</a>
+      <a href="/rooms/join/" class="btn btn-accent">Join Room with Code</a>
+      <a href="/rooms/duel/" class="btn btn-primary">1v1 Quick Match</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('.avatar-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.avatar-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+    });
+  });
+</script>
+{% endblock %}

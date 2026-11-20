@@ -1,0 +1,27 @@
+<nav class="navbar">
+  <div class="container nav-container">
+    <a href="/" class="brand">
+      <span class="brand-dot"></span>BLITZ ARENA
+    </a>
+    <ul class="nav-links">
+      {% if user.is_authenticated %}
+        <li><a href="/quizzes/" class="nav-link">My Quizzes</a></li>
+        <li><a href="/quizzes/explore/" class="nav-link">Explore</a></li>
+        <li><a href="/rooms/join/" class="nav-link">Join Room</a></li>
+        <li><a href="/rooms/duel/" class="nav-link">1v1 Duel</a></li>
+        <li><a href="/ai/generate/" class="nav-link">AI Generator</a></li>
+        <li>
+          <a href="{% url 'profile' %}" class="user-pill">
+            <span>{{ user.username }}</span>
+            <span class="badge">{{ user.xp }} XP</span>
+          </a>
+        </li>
+        <li><a href="{% url 'logout' %}" class="btn btn-secondary btn-sm">Log out</a></li>
+      {% else %}
+        <li><a href="{% url 'login' %}" class="nav-link">Log in</a></li>
+        <li><a href="{% url 'signup' %}" class="btn btn-primary btn-sm">Sign up</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+

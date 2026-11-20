@@ -1,0 +1,10 @@
+{% if messages %}
+  <div class="toast-container">
+    {% for message in messages %}
+      <div class="toast {% if message.tags == 'success' %}toast-success{% elif message.tags == 'error' %}toast-error{% else %}toast-info{% endif %}">
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
